@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import uvicorn
 from app.core.database import inicializar_banco
+from app.controllers.finance_controller import router as finance_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,6 +20,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+app.include_router(finance_router)
 
 @app.get("/")
 def read_root():

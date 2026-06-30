@@ -10,18 +10,23 @@ class FinanceService:
     def criar_transacao(self, transacao_schema) -> Dict[str, Any]:
         """Aplica as regras de negócio: categorização inteligente e criptografia."""
         dados = transacao_schema.model_dump()
+        valor_original = dados["amount"]
         
-        # Regra 1: Categorização Inteligente via Strategy Pattern se for uma despesa
-        if dados["type"] == "despesa":
+        # Regra 1: Categorização Inteligente via Strategy Pattern
+        if dados["kind"] == "despesa": 
             dados["category"] = self.contexto_categorizacao.classificar(dados["description"])
         else:
             dados["category"] = "receita"
 
-        # Regra 2: Criptografia contra vazamentos de dados sensíveis
+        # Regra 2: Criptografia para persistência segura
         dados["amount_encrypted"] = criptografar_valor(dados["amount"])
         del dados["amount"]
-
-        return TransactionRepository.salvar(dados)
+        resultado_banco = TransactionRepository.salvar(dados)
+        resultado_banco["amount"] = valor_original
+        if "amount_encrypted" in resultado_banco:
+            del resultado_banco["amount_encrypted"]
+            
+        return resultado_banco
 
     def listar_fluxo_caixa(self) -> List[Dict[str, Any]]:
         """Busca os dados brutos e descriptografa para exibição na API."""

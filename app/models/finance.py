@@ -1,29 +1,25 @@
 from pydantic import BaseModel, Field
 from datetime import date
-from typing import Optional
 
-# 1. Modelo para Transações (Entradas e Saídas)
 class TransactionBase(BaseModel):
-    description: str = Field(..., example="Aluguel do Escritório")
-    amount: float = Field(..., gt=0, example=1500.00)
-    date: date = Field(..., example="2026-07-01")
-    type: str = Field(..., example="despesa") # "receita" ou "despesa"
+    description: str = Field(..., max_length=255)
+    amount: float = Field(..., gt=0)
+    date: date
+    kind: str = Field(..., max_length=20) 
 
 class TransactionCreate(TransactionBase):
     pass
 
 class Transaction(TransactionBase):
     id: int
-    category: str = Field(..., example="fixo") # "fixo", "variável" ou "receita"
+    category: str = Field(..., max_length=50)
 
     class Config:
         from_attributes = True
 
-
-# 2. Modelo para as Metas de Orçamento
 class BudgetGoalBase(BaseModel):
-    category: str = Field(..., example="variável") # Alvo do alerta
-    max_limit: float = Field(..., gt=0, example=500.00)
+    category: str = Field(..., max_length=50)
+    max_limit: float = Field(..., gt=0)
 
 class BudgetGoalCreate(BudgetGoalBase):
     pass

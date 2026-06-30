@@ -10,13 +10,15 @@ def inicializar_banco():
     """Cria as tabelas necessárias para o MVP se elas não existirem."""
     with obter_conexao() as conn:
         with conn.cursor() as cur:
+            # cur.execute("DROP TABLE IF EXISTS transactions CASCADE;")
+            
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS transactions (
                     id SERIAL PRIMARY KEY,
                     description TEXT NOT NULL,
                     amount_encrypted TEXT NOT NULL,
                     date DATE NOT NULL,
-                    type TEXT NOT NULL,
+                    kind TEXT NOT NULL,
                     category TEXT NOT NULL
                 );
             """)

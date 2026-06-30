@@ -7,7 +7,7 @@ class TransactionRepository:
     def salvar(transaction_data: Dict[str, Any]) -> Dict[str, Any]:
         """Insere uma nova transação com o valor criptografado no banco."""
         query = """
-            INSERT INTO transactions (description, amount_encrypted, date, type, category)
+            INSERT INTO transactions (description, amount_encrypted, date, kind, category)
             VALUES (%s, %s, %s, %s, %s)
             RETURNING id;
         """
@@ -17,7 +17,7 @@ class TransactionRepository:
                     transaction_data["description"],
                     transaction_data["amount_encrypted"],
                     transaction_data["date"],
-                    transaction_data["type"],
+                    transaction_data["kind"],
                     transaction_data["category"]
                 ))
                 novo_id = cur.fetchone()["id"]
