@@ -1,6 +1,6 @@
 # Sistema de Controle Financeiro 💸
 ### Laboratório de Engenharia de Software | Grupo 8
-**Integrantes:** Diego Castilho & Davi Miyake [cite: 213]
+**Integrantes:** Diego Castilho & Davi Miyake 
 
 ---
 
