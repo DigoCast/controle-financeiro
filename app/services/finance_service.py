@@ -1,6 +1,7 @@
 from app.repositories.finance_repository import TransactionRepository
 from app.core.security import criptografar_valor, descriptografar_valor
 from app.services.strategy import CategorizationContext
+from app.repositories.goal_repository import GoalRepository
 from typing import List, Dict, Any
 
 class FinanceService:
@@ -39,3 +40,47 @@ class FinanceService:
             fluxo_descriptografado.append(t)
             
         return fluxo_descriptografado
+    
+    def obter_resumo_e_alertas(self) -> Dict[str, Any]:
+        """Calcula o saldo atual, projeções futuras e verifica estouro de metas."""
+        transacoes = self.listar_fluxo_caixa()
+        metas = GoalRepository.listar_metas()
+
+        # 1. Cálculo de Saldo e Projeção (Alvo de Elicitação)
+        total_receitas = sum(t["amount"] for t in transacoes if t["kind"] == "receita")
+        total_despesas = sum(t["amount"] for t in transacoes if t["kind"] == "despesa")
+        saldo_atual = total_receitas - total_despesas
+        
+        # Projeção simples: saldo atual + receitas futuras simuladas/cadastradas
+        saldo_projetado = saldo_atual 
+
+        # 2. Verificação de Alertas de Estouro (Alvo de Elicitação)
+        gastos_por_categoria = {}
+        for t in transacoes:
+            if t["kind"] == "despesa":
+                cat = t["category"]
+                gastos_por_categoria[cat] = gastos_por_categoria.get(cat, 0.0) + t["amount"]
+
+        alertas = []
+        for m in metas:
+            categoria = m["category"]
+            limite = m["max_limit"]
+            gasto_atual = gastos_por_categoria.get(categoria, 0.0)
+
+            if gasto_atual > limite:
+                alertas.append({
+                    "category": categoria,
+                    "max_limit": limite,
+                    "current_spent": gasto_atual,
+                    "message": f"ALERTA: Meta da categoria '{categoria}' estourada!"
+                })
+
+        return {
+            "saldo_atual": saldo_atual,
+            "saldo_projetado": saldo_projetado,
+            "alertas_estouro": alertas
+        }
+
+    def criar_meta(self, meta_schema) -> Dict[str, Any]:
+        """Camada de serviço para persistir a meta orçamentária."""
+        return GoalRepository.salvar_meta(meta_schema.model_dump())

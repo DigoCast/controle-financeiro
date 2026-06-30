@@ -1,9 +1,7 @@
 from cryptography.fernet import Fernet
 
-CHAVE_TEXTO = b'7_XdfG_TkXh8zR2-X8Q8Ym5C4U3V6_Z9M1k2P3q4w5e='
-CHAVE_VALIDA = Fernet.generate_key() 
-
-fernet = Fernet(CHAVE_VALIDA)
+CHAVE_FIXA = b'7_XdfG_TkXh8zR2-X8Q8Ym5C4U3V6_Z9M1k2P3q4w5e='
+fernet = Fernet(CHAVE_FIXA)
 
 def criptografar_valor(valor: float) -> str:
     """Transforma um valor numérico (saldo/receita) em uma string criptografada."""
