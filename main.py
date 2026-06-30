@@ -1,10 +1,23 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 import uvicorn
+from app.core.database import inicializar_banco
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        inicializar_banco()
+        print("Banco de dados PostgreSQL inicializado com sucesso!")
+    except Exception as e:
+        print(f"Erro ao conectar no PostgreSQL: {e}")
+    
+    yield 
 
 app = FastAPI(
     title="Controle Financeiro API",
     description="MVP para o Laboratório de Engenharia de Software - Grupo 8",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 @app.get("/")
